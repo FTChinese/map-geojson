@@ -1,0 +1,938 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>OUR D3.JS &#187; JSON</title>
+	<atom:link href="http://www.ourd3js.com/wordpress/?feed=rss2&#038;tag=json" rel="self" type="application/rss+xml" />
+	<link>http://www.ourd3js.com/wordpress</link>
+	<description>数据可视化专题站</description>
+	<lastBuildDate>Fri, 11 Mar 2016 23:27:42 +0000</lastBuildDate>
+	<language>zh-CN</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>http://wordpress.org/?v=4.2.8</generator>
+
+	<image>
+		<url>http://www.ourd3js.com/wordpress/wp-content/uploads/2016/03/ourd3logo2-56e17bf1v1_site_icon-32x32.png</url>
+		<title> &#187; JSON</title>
+		<link>http://www.ourd3js.com/wordpress</link>
+		<width>32</width>
+		<height>32</height>
+	</image> 
+	<item>
+		<title>【 JSON 浅谈 — 7.0 】 GeoJSON 和 TopoJSON</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1947</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1947#comments</comments>
+		<pubDate>Sat, 05 Sep 2015 03:06:22 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[GeoJSON]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[TopoJSON]]></category>
+		<category><![CDATA[地理]]></category>
+		<category><![CDATA[格式]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1947</guid>
+		<description><![CDATA[GeoJSON 和 TopoJSON 是符合 JSON 语法规则的两种数据格式， &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1947">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>GeoJSON 和 TopoJSON 是符合 JSON 语法规则的两种数据格式，用于表示地理信息。</p>
+<p style="text-align: center;"><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/geojson.png"><img class="alignnone size-full wp-image-1948" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/geojson.png" alt="geojson" width="478" height="159" /></a></p>
+<p><span id="more-1947"></span></p>
+<p>本站的 D3.js 各系列文章里，在制作地图的时候，大量使用了 GeoJSON 和 TopoJSON 格式的文件。</p>
+<h1>1. GeoJSON</h1>
+<p>GeoJSON 是用于描述地理空间信息的数据格式。GeoJSON 不是一种新的格式，其语法规范是符合 JSON 格式的，只不过对其名称进行了规范，专门用于表示地理信息。</p>
+<p>GeoJSON 的最外层是一个单独的对象（object）。这个对象可表示：</p>
+<ul>
+<li>几何体（Geometry）。</li>
+<li>特征（Feature）。</li>
+<li>特征集合（FeatureCollection）。</li>
+</ul>
+<p>最外层的 GeoJSON 里可能包含有很多子对象，每一个 GeoJSON 对象都有一个 type 属性，表示对象的类型，type 的值必须是下面之一。</p>
+<ul>
+<li>Point：点。</li>
+<li>MultiPoint：多点。</li>
+<li>LineString：线。</li>
+<li>MultiLineString：多线。</li>
+<li>Polygon：面。</li>
+<li>MultiPolygon：多面。</li>
+<li>GeometryCollection：几何体集合。</li>
+<li>Feature：特征。</li>
+<li>FeatureCollection：特征集合。</li>
+</ul>
+<p>下面举几个例子。</p>
+<p>点对象：</p>
+<p></p><pre class="crayon-plain-tag">{
+"type": "Point",
+"coordinates": [ -105, 39 ]
+}</pre><p></p>
+<p>线对象：</p>
+<p></p><pre class="crayon-plain-tag">{
+"type": "LineString",
+"coordinates": [[-105, 39 ], [-107, 38 ]]
+}</pre><p></p>
+<p>面对象：</p>
+<p></p><pre class="crayon-plain-tag">{
+"type": "Polygon",
+"coordinates":[[ [30, 0], [31, 0], [31, 5], [30, 5], [30, 0] ]]
+}</pre><p></p>
+<p>由以上格式可以发现，每一个对象都有一个成员变量 coordinates。如果 type 的值为 Point、MultiPoint、LineString、MultiLineString、Polygon、MultiPolygon 之一，则该对象必须有变量 coordinates。</p>
+<p>如果 type 的值为 GeometryCollection（几何体集合），那么该对象必须有变量 geometries，其值是一个数组，数组的每一项都是一个 GeoJSON 的几何对象。例如：</p>
+<p></p><pre class="crayon-plain-tag">{
+    "type": "GeometryCollection",
+    "geometries": [
+        {
+            "type": "Point",
+            "coordinates": [100, 40]
+        },
+        {
+            "type": "LineString",
+            "coordinates": [ [100, 30], [100, 35] ]
+        }
+    ]
+}</pre><p></p>
+<p>如果 type 的值为 Feature（特征），那么此特征对象必须包含有变量 geometry，表示几何体，geometry 的值必须是几何体对象。此特征对象还包含有一个 properties，表示特性，properties 的值可以是任意 JSON 对象或 null。例如：</p>
+<p></p><pre class="crayon-plain-tag">{
+    "type": "Feature",
+    "properties": {
+        "name": "北京"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [ 116.3671875, 39.977120098439634]
+    }
+}</pre><p></p>
+<p>如果 type 的值为 FeatureCollection（特征集合），则该对象必须有一个名称为 features 的成员。features 的值是一个数组，数组的每一项都是一个特征对象。</p>
+<h1>2. TopoJSON</h1>
+<p>TopoJSON 是 GeoJSON 按拓扑学编码后的扩展形式，是由 D3 的作者 Mike Bostock 制定的。相比 GeoJSON 直接使用 Polygon、Point 之类的几何体来表示图形的方法，TopoJSON 中的每一个几何体都是通过将共享边（被称为arcs）整合后组成的。</p>
+<p>TopoJSON 消除了冗余，文件大小缩小了 80%，因为：</p>
+<ul>
+<li>边界线只记录一次（例如广西和广东的交界线只记录一次）。</li>
+<li>地理坐标使用整数，不使用浮点数。</li>
+</ul>
+<h1>3. 在线工具</h1>
+<p>在线生成 GeoJSON：<a href="http://geojson.io/">http://geojson.io/</a></p>
+<p>简化、转换 GeoJSON 和 TopoJSON：<a href="http://mapshaper.org/">http://mapshaper.org/</a></p>
+<p>&nbsp;</p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 9 月 5 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1947</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 JSON 浅谈 — 6.0 】 Ajax 和 JSON</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1940</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1940#comments</comments>
+		<pubDate>Fri, 04 Sep 2015 13:55:25 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[ajax]]></category>
+		<category><![CDATA[d3.json]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[服务器]]></category>
+		<category><![CDATA[请求]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1940</guid>
+		<description><![CDATA[JSON 文件被放置在服务器端，客户端请求该文件用得最多的是 Ajax，能够实现 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1940">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>JSON 文件被放置在服务器端，客户端请求该文件用得最多的是 Ajax，能够实现异步请求。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/json6-1.png"><img class="alignnone size-full wp-image-1941 aligncenter" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/json6-1.png" alt="json6-1" width="478" height="159" /></a></p>
+<p><span id="more-1940"></span></p>
+<h1>1. Ajax 是什么</h1>
+<p>AJAX，全称 Asynchronous JavaScript and XML，即“异步的 JavaScript 和 XML”，一般写作 Ajax。</p>
+<p>Ajax 能够与服务器交换少量数据，从而异步地更新部分网页。<strong>异步</strong>指的是当 Ajax 执行交换数据的操作时，其他的操作仍然可以执行。</p>
+<p>一个最常见的应用是：打开百度或谷歌首页，当输入文字后，搜索栏下方会显示出几个建议的搜索词。这正是 Ajax 的应用。</p>
+<h1>2. 创建和使用 Ajax</h1>
+<p>创建 Ajax 对象要考虑浏览器的版本问题，主要分为两大类：IE7+/Chrome/Firefox/&#8230; 和 IE6/IE5.。</p>
+<p></p><pre class="crayon-plain-tag">function CreateXHR(){
+    if (window.XMLHttpRequest)
+    {
+        //对浏览器 IE7+, Firefox, Chrome, Opera, Safari
+        return new XMLHttpRequest();
+    }
+    else
+    {
+        //对浏览器 IE6, IE5
+        return new ActiveXObject("Microsoft.XMLHTTP");
+    }
+}</pre><p></p>
+<p>然后，只要用如下方式创建即可。</p>
+<p></p><pre class="crayon-plain-tag">var xmlhttp; 
+
+xmlhttp = CreateXHR();</pre><p></p>
+<p>假设服务器端有一个文件 test.json，则异步地请求文件，并输出到控制台的代码如下。</p>
+<p></p><pre class="crayon-plain-tag">xmlhttp.open("GET","test.json",true);
+xmlhttp.send();
+
+xmlhttp.onreadystatechange = function(){
+    if(xmlhttp.readyState == 4 &amp;&amp; xmlhttp.status == 200){
+        var jsonstr = xmlhttp.responseText;
+        console.log(jsonstr);
+    }
+}</pre><p></p>
+<p>其中，xmlhttp.<strong>readyState</strong> 存有 XMLHttpRequest 的状态，有五个值：</p>
+<ul>
+<li>0: 请求未初始化</li>
+<li>1: 服务器连接已建立</li>
+<li>2: 请求已接收</li>
+<li>3: 请求处理中</li>
+<li>4: 请求已完成，且响应已就绪</li>
+</ul>
+<p>xmlhttp.<strong>staus</strong> 的值为请求结果，200 表示“OK”，404 表示未找到页面。</p>
+<p>获取来自服务器的响应，可使用 XMLHttpRequest 对象的 responseText 或 responseXML 属性，前者是以字符串形式，后者是以 XML 形式。</p>
+<h1>3. d3.json、d3.xml 等函数的实质</h1>
+<p>在 D3.js 中经常使用的 d3.json、d3.xml 等请求服务器数据的函数，都是 Ajax 的作用结果。例如，通过本章和【<a href="http://www.ourd3js.com/wordpress/?p=1892">JSON &#8211; 第 3.0 章</a>】的内容，我们可以想象，d3.json 就是：</p>
+<p><strong>通过 Ajax 请求服务器的数据，然后用 JSON.parse() 将返回的字符串转换成 JavaScript 对象的结果。</strong></p>
+<p>因此，要时刻记住 d3.json 是异步请求，像这样的代码是不可取的：</p>
+<p></p><pre class="crayon-plain-tag">var str;
+
+d3.json("test.json",function(error,data){
+    str = data;
+});
+
+//输出undefined，因为这条代码执行时，d3.json 尚未执行完毕
+console.log(str);</pre><p></p>
+<h1>参考资料</h1>
+<p>[1] Ajax 教程，<a href="http://www.runoob.com/ajax/ajax-tutorial.html">http://www.runoob.com/ajax/ajax-tutorial.html</a></p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 9 月 4 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1940</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 JSON 浅谈 — 5.0 】 JSON 和 XML</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1933</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1933#comments</comments>
+		<pubDate>Thu, 03 Sep 2015 12:41:19 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[字符串]]></category>
+		<category><![CDATA[对象]]></category>
+		<category><![CDATA[转换]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1933</guid>
+		<description><![CDATA[JSON 和 XML 常被用来做比较，它们各有自己的优势和适用范围，有时候需要相 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1933">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>JSON 和 XML 常被用来做比较，它们各有自己的优势和适用范围，有时候需要相互转换。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/xml.png"><img class="alignnone size-full wp-image-1934 aligncenter" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/xml.png" alt="xml" width="478" height="159" /></a></p>
+<p><span id="more-1933"></span></p>
+<h1>1. 下载相关文件</h1>
+<p>网络上有很多库可以使用，大家可以自己查询，很容易找到，在这里推荐一种方法，要结合 JQuery 使用。</p>
+<p>首先下载 JQuery：<a href="http://jquery.com/download/">下载页面</a></p>
+<p>然后在 json.cn 下载两个文件：<a href="http://json.cn/download/jquery.json2xml.js">jquery.json2xml.js</a> 和 <a href="http://json.cn/download/jquery.xml2json.js">jquery.xml2json.js</a></p>
+<p>之后，在你要写的页面文件中，用如下方式引用三个文件即可：</p>
+<p></p><pre class="crayon-plain-tag">&lt;script src="jquery-2.1.4.min.js"&gt;&lt;/script&gt;
+&lt;script src="jquery.xml2json.js"&gt;&lt;/script&gt;
+&lt;script src="jquery.json2xml.js"&gt;&lt;/script&gt;</pre><p></p>
+<p>其中，JQuery 的版本号要改成你自己的。</p>
+<h1>2. XML 字符串转换成 JSON 对象</h1>
+<p>使用方法很简单了，代码形如：</p>
+<p></p><pre class="crayon-plain-tag">var str = "&lt;root&gt;" + 
+            "&lt;name&gt;Alice&lt;/name&gt;" +
+            "&lt;age&gt;Alice&lt;/age&gt;" +
+            "&lt;friends&gt;I&lt;/friends&gt;" +
+            "&lt;friends&gt;you&lt;/friends&gt;" +
+            "&lt;friends&gt;he&lt;/friends&gt;" +
+          "&lt;/root&gt;";
+
+var obj = $.xml2json(str);
+
+console.log(obj);</pre><p></p>
+<p>str 是一个 xml 字符串，xml2json 将它转换成了一个对象，保存在 obj 里。在控制台的输出如下：</p>
+<p style="text-align: center;"><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/xmltojson.png"><img class="alignnone size-full wp-image-1935" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/09/xmltojson.png" alt="xmltojson" width="278" height="225" /></a></p>
+<p>这是一个 JavaScript 的对象，如果需要将其转换成 JSON 字符串，使用 【<a href="http://www.ourd3js.com/wordpress/?p=1898">JSON &#8211; 第 4.0 章</a>】提到的 JSON.stringify 即可。</p>
+<h1>3. JSON 对象转换成 XML 字符串</h1>
+<p>下面的代码将 JavaScript 对象转换成 XML 字符串。</p>
+<p></p><pre class="crayon-plain-tag">var obj = {
+    company: "Xiaomi",
+    CEO: "Lei",
+    products: ["cellphone","TV"],
+};
+
+
+var xml = $.json2xml(obj);
+
+console.log(xml);
+
+//输出如下：
+//&lt;root&gt;
+//  &lt;company&gt;Xiaomi&lt;/company&gt;
+//  &lt;CEO&gt;Lei&lt;/CEO&gt;
+//  &lt;products&gt;cellphone&lt;/products&gt;
+//  &lt;products&gt;TV&lt;/products&gt;
+//&lt;/root&gt;</pre><p></p>
+<p>如果对象里有函数或一些特殊的值呢？有函数也会将函数体里的内容直接转换到 XML 字符串里的。</p>
+<p></p><pre class="crayon-plain-tag">var obj = {
+    a: undefined,
+    b: function(){
+        return 1;
+    },
+    c: {
+        name: "Geoff Lui",
+        age: 26
+    }
+};
+
+var xml = $.json2xml(obj);
+
+console.log(xml);
+
+//输出：
+//&lt;root&gt;
+//  &lt;a&gt;undefined&lt;/a&gt;
+//  &lt;b&gt;function (){
+//      return 1;
+//  }&lt;/b&gt;
+//  &lt;c&gt;
+//    &lt;name&gt;Geoff Lui&lt;/name&gt;
+//    &lt;age&gt;26&lt;/age&gt;
+//  &lt;/c&gt;
+//&lt;/root&gt;</pre><p></p>
+<p>&nbsp;</p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 9 月 3 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1933</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 JSON 浅谈 — 4.0 】 序列化</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1898</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1898#comments</comments>
+		<pubDate>Sun, 30 Aug 2015 01:44:15 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[replace]]></category>
+		<category><![CDATA[参数]]></category>
+		<category><![CDATA[字符串]]></category>
+		<category><![CDATA[序列化]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1898</guid>
+		<description><![CDATA[序列化，指将 JavaScript 值转化为 JSON 字符串的过程。 JSON &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1898">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>序列化，指将 JavaScript 值转化为 JSON 字符串的过程。</p>
+<p style="text-align: center;"><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/stringify.png"><img class="alignnone size-full wp-image-1899" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/stringify.png" alt="stringify" width="478" height="159" /></a></p>
+<p><span id="more-1898"></span></p>
+<p>JSON.stringify() 能够将 JavaScript 值转换成 JSON 字符串。JSON.stringify() 生成的字符串可以用 JSON.parse() 再还原成 JavaScript 值。</p>
+<h1>1. 参数的含义</h1>
+<p></p><pre class="crayon-plain-tag">JSON.stringify(value[, replacer[, space]])</pre><p></p>
+<ul>
+<li>value：必选参数。被变换的 JavaScript 值，一般是对象或数组。</li>
+<li>replace：可以省略。有两种选择：函数或数组。
+<ul>
+<li>如果是函数，则每一组名称/值对都会调用此函数，该函数返回一个值，作为名称的值变换到结果字符串中，如果返回 undefined，则该成员被忽略。</li>
+<li>如果是数组，则只有数组中存在名称才能够被转换，且转换后顺序与数组中的值保持一致。</li>
+</ul>
+</li>
+<li>space：可以省略。这是为了排版、方便阅读而存在的。可以在 JSON 字符串中添加空白或制表符等。</li>
+</ul>
+<h1>2. value 用法</h1>
+<p>只用第一个参数，就是直接将 JavaScript 值转换成 JSON 字符串，不做任何的处理。</p>
+<p></p><pre class="crayon-plain-tag">var obj = {
+    name: "Geoff Lui",
+    age: 26,
+    nationality: "China"
+};
+
+var json = JSON.stringify(obj);
+
+console.log(json);
+
+//输出：
+//{"name":"Geoff Lui","age":26,"nationality":"China"}</pre><p></p>
+<p>如果存在不符合 JSON 语法的值，则自动忽略，例如 undefined 和 function。</p>
+<p></p><pre class="crayon-plain-tag">var obj = {
+    name: "Geoff Lui",
+    age: 26,
+    nationality: "China",
+    school: undefined,
+    add: function(){
+        this.age++;
+    }
+};
+
+var json = JSON.stringify(obj);
+
+console.log(json);
+
+//输出：
+//{"name":"Geoff Lui","age":26,"nationality":"China"}
+//属性school和函数add被省略</pre><p></p>
+<p>如果数组里有函数，则转换为 null。</p>
+<p></p><pre class="crayon-plain-tag">var obj = {
+    name: "Geoff Lui",
+    friends: [function(){}]
+};
+
+var json = JSON.stringify(obj);
+
+//结果：
+//{"name":"Geoff Lui","friends":[null]}</pre><p></p>
+<h1>3. replace 的用法</h1>
+<p>replace 可以是函数或数组。如果是函数，则每一组名称/值对都会调用此函数。与 JSON.parse() 类似。</p>
+<p></p><pre class="crayon-plain-tag">var obj = {
+    name: "Geoff Lui",
+    age: 26
+};
+
+var json = JSON.stringify(obj, fun);
+
+function fun(name, value){
+    console.log(name + ":" + value);
+    return value;
+}
+
+// 输出
+// :[object Object]
+// name:Geoff Lui
+// age:26</pre><p></p>
+<p>如果是数组，则只有数组中存在名称才能够被转换，且转换后顺序与数组中的值保持一致。</p>
+<p></p><pre class="crayon-plain-tag">var obj = { a: 1, b: 2, c: 3, d: 4 };
+
+var json = JSON.stringify(obj, ["c","b","a"]);
+
+console.log(json);
+
+//输出：
+//{"c":3,"b":2,"a":1}</pre><p></p>
+<h1>4. space 的用法</h1>
+<p>space 是用于排版的，可在 JSON 中插入制表符能使其更加美观。当然，也可以插入别的字符。</p>
+<p></p><pre class="crayon-plain-tag">var obj = { a: 1, b: 2, c: 3, d: 4 };
+
+var json = JSON.stringify(obj, ["c","b","a"], "\t");
+
+console.log(json);
+
+//输出：
+//{
+//  "c": 3,
+//  "b": 2,
+//  "a": 1
+//}</pre><p></p>
+<h1>参考资料</h1>
+<p>[1] JSON 对象，<a href="http://javascript.ruanyifeng.com/stdlib/json.html">http://javascript.ruanyifeng.com/stdlib/json.html</a></p>
+<p>[2] JSON.stringify，<a href="https://msdn.microsoft.com/ja-jp/library/cc836459">https://msdn.microsoft.com/ja-jp/library/cc836459</a></p>
+<p>&nbsp;</p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 8 月 30 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1898</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 JSON 浅谈 — 3.0 】 解析</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1892</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1892#comments</comments>
+		<pubDate>Sat, 29 Aug 2015 12:24:14 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[eval]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[parse]]></category>
+		<category><![CDATA[字符串]]></category>
+		<category><![CDATA[解析]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1892</guid>
+		<description><![CDATA[解析，是指将符合 JSON 语法规则的字符串转换成对象的过程。 不同的编程语言都 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1892">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>解析，是指将符合 JSON 语法规则的字符串转换成对象的过程。</p>
+<p style="text-align: center;"><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/parse.png"><img class="alignnone size-full wp-image-1894" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/parse.png" alt="parse" width="478" height="159" /></a></p>
+<p><span id="more-1892"></span></p>
+<p>不同的编程语言都提供了解析 JSON 字符串的方法，在这里主要讲解 JavaScript 中的解析方法。主要有三种：</p>
+<ul>
+<li>使用 eval()</li>
+<li>使用 JSON.parse()</li>
+<li>使用第三方库，例如 JQuery 等</li>
+</ul>
+<h1>1. eval()</h1>
+<p>eval() 函数的参数是一个字符串，其作用是直接执行其中的 JavaScript 代码。</p>
+<p></p><pre class="crayon-plain-tag">var jsstr = "console.log('Hello')";
+
+eval(jsstr);  //在控制台输出 Hello</pre><p></p>
+<p>eval() 能够解析 JSON 字符串。从这里也可以看得出，JSON 和 JavaScript 是高度嵌合的。</p>
+<p>但是，现在已经很少直接使用 eval() 来解析了，如果您的浏览器版本真的是很旧，可能才需要这个方法。此外，eval() 是一个相对危险的函数，因为字符串中可能含有未知因素。在这里，作为学习，还是要知道这也是一种方法。</p>
+<p></p><pre class="crayon-plain-tag">var str = '{"name":"Geoff Lui", "age": 26}';
+
+var obj = eval("(" + str + ")");
+
+console.log(obj);  //输出解析后的对象</pre><p></p>
+<p>请注意 eval() 的参数，在字符串两旁加了括号，这是必须的，否则会报错。</p>
+<p>因为 JSON 字符串是被大括号（“{}”）包围的，直接放到 eval() 会被当成语句块来执行，因此要在两旁加上括号，使其变成表达式。</p>
+<p></p><pre class="crayon-plain-tag">var a = eval("{}");
+
+console.log(a);   //输出 undefined
+
+var b = eval("({})");
+
+console.log(b);   //输出 Object{}</pre><p></p>
+<h1>2. JSON.parse()</h1>
+<p>现在绝大多数浏览器都以支持 JSON.parse()，是推荐使用的方式。</p>
+<p></p><pre class="crayon-plain-tag">var str = '{"name":"Geoff Lui", "age": 26}';
+
+var obj = JSON.parse(str);
+
+console.log(obj);  //输出解析后的对象</pre><p></p>
+<p>如果输入了不符合规范的字符串，会报错。</p>
+<p></p><pre class="crayon-plain-tag">JSON.parse("{age: 26}");  //报错，因为 age 没有用双引号</pre><p></p>
+<p>JSON.parse() 可以有第二个参数，是一个函数。此函数有两个参数：name 和 value，分别代表名称和值。当传入一个 JSON 字符串后，JSON 的每一组名称/值对都要调用此函数。该函数有返回值，返回值将赋值给当前的名称（name）。</p>
+<p></p><pre class="crayon-plain-tag">var str = '{"name":"Geoff Lui", "age": 26}';
+
+var obj = JSON.parse(str, fun);
+
+function fun(name, value){
+    console.log(name + ": " + value);
+        return value;    //注意不要忘记返回 value
+}
+
+//输出：
+//name: Geoff Lui
+//age: 26
+//: [object Object]</pre><p></p>
+<p>第一、二行输出分别是 str 的两个名称/值对。第三行输出是 JSON 最外层的对象本身：没有名称，只有值，值是一个对象。</p>
+<p>利用第二个参数，可以在解析 JSON 字符串的同时对数据进行一些处理。</p>
+<p></p><pre class="crayon-plain-tag">var str = '{"age": 26, "money": 10000}';
+
+var obj = JSON.parse(str,fun);
+
+function fun(name, value){
+    if( name == "age" )
+        value = 14;
+    return value;
+}
+
+console.log(obj); // 输出 Object {age: 14, money: 10000}</pre><p></p>
+<h1>参考资料</h1>
+<p>[1] JSON Howto，<a href="http://www.w3schools.com/json/json_eval.asp">http://www.w3schools.com/json/json_eval.asp</a></p>
+<p>[2] JSON 对象，<a href="http://javascript.ruanyifeng.com/stdlib/json.html">http://javascript.ruanyifeng.com/stdlib/json.html</a></p>
+<p>&nbsp;</p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 8 月 29 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1892</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 JSON 浅谈 — 2.0 】 语法规则</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1874</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1874#comments</comments>
+		<pubDate>Sat, 29 Aug 2015 04:45:55 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[字符串]]></category>
+		<category><![CDATA[对象]]></category>
+		<category><![CDATA[数组]]></category>
+		<category><![CDATA[语法]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1874</guid>
+		<description><![CDATA[JSON 的语法规则十分简单，无论用何种方法总结都只有数条而已，它参考了 C 语 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1874">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>JSON 的语法规则十分简单，无论用何种方法总结都只有数条而已，它参考了 C 语言家族的一些习惯，学习起来并不会感到陌生。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/format.png"><img class="alignnone size-full wp-image-1875 aligncenter" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/format.png" alt="format" width="478" height="159" /></a></p>
+<p><span id="more-1874"></span></p>
+<p>【<a href="http://www.ourd3js.com/wordpress/?p=1852">JSON 第 1 章</a>】里提到了 JSON 的五点语法：</p>
+<ul>
+<li>数组（Array）用方括号(&#8220;[]&#8221;)表示。</li>
+<li>对象（Object）用大括号（&#8221;{}&#8221;）表示。</li>
+<li>名称/值对（name/value）之间用冒号（&#8221;：&#8221;）隔开。</li>
+<li>名称（name）置于双引号中，值（value）有字符串、数值、布尔值、null、对象和数组。</li>
+<li>并列的数据之间用逗号（“,”）分隔</li>
+</ul>
+<p>基于以上的语法规则，接下来举一些例子来详细讲解如何使用、以及使用中存在的问题。</p>
+<h1>1. 对象（Object）</h1>
+<p>对象用大括号（“{}”）括起来，大括号里是一系列的“名称/值对”，其概念图如下：</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/object.png"><img class="alignnone size-full wp-image-1879" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/object.png" alt="object" width="621" height="126" /></a></p>
+<p>例如，以下对象是合法的：</p>
+<p></p><pre class="crayon-plain-tag">{}  //空对象
+
+{"name":"Geoff Lui"} 
+
+{"name":"Mary", "age": 10}
+
+{
+    "name":"Alice",
+    "age":14,
+    "mother":{                //对象里包含对象
+        "name":"Gwen",
+        "age":40
+    }
+}</pre><p></p>
+<p>两个并列的数据之间用逗号（“,”）隔开，注意两点：</p>
+<ul>
+<li>使用英文的逗号（“,”），不要用中文的逗号（“，”）</li>
+<li>最后一个“名称/值对“之后不要加逗号</li>
+</ul>
+<h1>2. 数组（Array）</h1>
+<p>数组表示一系列有序的值，用方括号（“[]”）包围起来，并列的值之间用逗号分隔，概念图如下。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/array.png"><img class="alignnone size-full wp-image-1882" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/array.png" alt="array" width="627" height="128" /></a></p>
+<p>例如，以下的数组是合法的：</p>
+<p></p><pre class="crayon-plain-tag">[]    //空数组
+
+[1, 2, 3, 4]
+
+["one", "two", "three", "four"]
+
+["one", "two", 3, 4]     //同一个数组中可以有不同的数据类型
+
+["one", ["two", "three"]]  //数组里可以有数组
+
+[1, true, {"name":"John"}]  //数组里可以有对象</pre><p></p>
+<h1>3. 名称/值对（Name/Value）</h1>
+<p>名称（Name）是一个字符串，要用双引号括起来，不能用单引号，也不能没有引号，这一点与 JavaScript 不同。</p>
+<p>值的类型只有六种：字符串（string）、数值（number）、对象（object）、数组（array）、true、false、null。不能有这之外的类型，例如 undefined、函数等。其概念图如下。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/value.png"><img class="alignnone size-full wp-image-1884" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/value.png" alt="value" width="613" height="284" /></a></p>
+<p>字符串（string）的规则如下：</p>
+<ul>
+<li>英文双引号括起来，不能用单引号，也不能没有。</li>
+<li>字符串中不能单独出现双引号（&#8221;） 和右斜杠（“\”）。</li>
+<li>如果要打双引号或右斜杠，需要使用“右斜杠+字符”的形式，例如 \&#8221; 和 \\，其它的转意字符也是如此</li>
+</ul>
+<p>其概念图如下所示。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/string.png"><img class="alignnone size-full wp-image-1885" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/string.png" alt="string" width="611" height="431" /></a></p>
+<p>请看以下合法的和不合法的字符串例子。</p>
+<p></p><pre class="crayon-plain-tag">{"string": "one" }    //合法
+
+{"string": 'one' }    //不合法，不能用单引号
+
+{"string": one }    //不合法，没有加双引号
+
+{"string": "My father's name is John"}    //合法
+
+{"string": "My father said, "He likes dogs.""}    //不合法，字符串中有双引号
+
+{"string": "My father said, \"He likes dogs.\""}    //合法
+
+{"string": "\tMy Name is Alice."}    //合法</pre><p></p>
+<p>数值的概念图如下。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/number.png"><img class="alignnone size-full wp-image-1881" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/number.png" alt="number" width="622" height="282" /></a></p>
+<p>请看以下的例子。</p>
+<p></p><pre class="crayon-plain-tag">{"money": 10 }   //合法
+
+{"money": 0.33 }   //合法
+
+{"money": -5.5 }   //合法
+
+{"money": 1e-5 }   //合法
+
+{"money": 1e5 }   //合法
+
+{"money": 0x55 }   //不合法，不能用十六进制
+
+{"money": 055 }   //不合法，不能用八进制</pre><p></p>
+<h1>4. 验证 JSON 格式</h1>
+<p>验证自己的 JSON 格式是否正确，可以在：<a href="http://json.cn/">http://json.cn/</a> 验证。如有错误会有提示。</p>
+<h1>参考资料</h1>
+<p>[1] JSON 对象，<a href="http://javascript.ruanyifeng.com/stdlib/json.html">http://javascript.ruanyifeng.com/stdlib/json.html</a></p>
+<p>[2] JSON 介绍，<a href="http://www.json.org.cn/">http://www.json.org.cn/</a></p>
+<p>&nbsp;</p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 8 月 29 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1874</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 JSON 浅谈 — 1.0 】 简介</title>
+		<link>http://www.ourd3js.com/wordpress/?p=1852</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=1852#comments</comments>
+		<pubDate>Thu, 27 Aug 2015 14:18:40 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[JSON 浅谈]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[简介]]></category>
+		<category><![CDATA[解析]]></category>
+		<category><![CDATA[语法]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=1852</guid>
+		<description><![CDATA[JSON 是一种用于数据交换的文本格式，诞生于 2001 年。这种格式不仅人很容 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=1852">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>JSON 是一种用于数据交换的文本格式，诞生于 2001 年。这种格式不仅人很容易进行阅读和编写，同时机器也很容易解析和生成，是当前十分流行的数据格式，尤其是在前端领域，在本站 D3 的教程中已经多次用到。</p>
+<p><a href="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/json1-1.png"><img class="alignnone size-full wp-image-1853 aligncenter" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2015/08/json1-1.png" alt="json1-1" width="478" height="159" /></a></p>
+<p><span id="more-1852"></span></p>
+<h1>1. JSON 是什么</h1>
+<p>JSON，全称是 JavaScript Object Notation，即 JavaScript 对象标记法。这是一种<strong>轻量级</strong>（Light-Weight）、<strong>基于文本的</strong>（Text-Based）、<strong>可读的</strong>（Human-Readable）格式。</p>
+<p>JSON 的名称中虽然带有 JavaScript，但这是指其语法规则是参考 JavaScript 对象的，而不是指只能用于 JavaScript 语言。实际上很多语言（如 C++、Java、PHP 等）都配有 JSON 的解析和生成器。</p>
+<p>JSON 无论对于人，还是对于机器来说，都是十分便于阅读和书写的，而且相比 XML （另一种常见的数据交换格式），文件更小，因此迅速成为网络上十分流行的交换格式。</p>
+<p>近年来 JavaScript 已经成为浏览器上事实上的标准语言，也是 Github 上最流行的编程语言。Github 上最受关注的 10 个仓库中，有 7 个是用 JavaScript 开发的。JavaScript 的风靡，与 JSON 的流行也有密切的关系。因为 JSON 本身就是参考 JavaScript 对象的规则定义的，其语法与 JavaScript 定义对象的语法几乎完全相同。</p>
+<p>另外，JSON 格式的创始人声称此格式永远不升级，这就表示这种格式具有长时间的稳定性，10 年前写的文件，10 年后也能用，没有任何兼容性问题。</p>
+<h1>2. JSON 的语法规则是怎样的</h1>
+<p>JSON 的语法规则十分简单，可称得上“优雅完美”，总结起来有：</p>
+<ul>
+<li>数组（Array）用方括号(&#8220;[]&#8221;)表示。</li>
+<li>对象（Object）用大括号（&#8221;{}&#8221;）表示。</li>
+<li>名称/值对（name/value）之间用冒号（&#8221;：&#8221;）隔开。</li>
+<li>名称（name）置于双引号中，值（value）有字符串、数值、布尔值、null、对象和数组。</li>
+<li>并列的数据之间用逗号（“,”）分隔</li>
+</ul>
+<p>例如， 以下是一个符合规则的 JSON 文本：</p>
+<p></p><pre class="crayon-plain-tag">{
+    "name": "Geoff Lui",
+    "age": 26,
+    "isChinese": true
+}</pre><p></p>
+<p>“名称/值对”里，值可以是数组和对象，例如：</p>
+<p></p><pre class="crayon-plain-tag">{
+    "name": "Geoff Lui",
+    "age": 26,
+    "isChinese": true,
+    "friends":["Lucy", "Lily", "Gwen"],
+    "Mother": {
+        "name": "Mary Lui",
+        "age": 54
+    }
+}</pre><p></p>
+<h1>3. JSON 和 XML</h1>
+<p>JSON 常被拿来与 XML 做比较，因为 JSON 的诞生本来就多多少少要有取代 XML 的意思。相比 XML，JSON 的优势如下：</p>
+<ul>
+<li>没有结束标签，长度更短，读写更快</li>
+<li>能够直接被 JavaScript 解释器解析</li>
+<li>可以使用数组</li>
+</ul>
+<p>下面是描述同样信息的 XML 文件和 JSON 文件，来看看区别。</p>
+<p>JSON：</p>
+<p></p><pre class="crayon-plain-tag">{
+    "name": "Geoff Lui",
+    "age": 26,
+    "isChinese": true,
+    "friends":["Lucy", "Lily", "Gwen"]
+}</pre><p></p>
+<p>XML：</p>
+<p></p><pre class="crayon-plain-tag">&lt;root&gt;
+    &lt;name&gt;Geoff Lui&lt;/name&gt;
+    &lt;age&gt;Geoff Lui&lt;/age&gt;
+    &lt;friends&gt;Lucy&lt;/friends&gt;
+    &lt;friends&gt;Lily&lt;/friends&gt;
+    &lt;friends&gt;Gwen&lt;/friends&gt;
+&lt;/root&gt;</pre><p></p>
+<p>可以看到，描述同样的信息，XML 更加麻烦，而 JSON 要轻巧得多，在有数组出现的情况下更加明显。而且，当数组项很多的时候，XML 文件中的大量信息都被用于描述没什么用的标签上了。</p>
+<p>但是，绝不是说 XML 就一无是处，要完全放弃，归根结底还是要看有怎样的开发要求。</p>
+<h1>4. JSON 解析</h1>
+<p>在 JavaScript 中，有两个方法与此相关：JSON.stringify 和 JSON.parse。其中：</p>
+<ul>
+<li>JSON.stringify 用于将 JavaScript 对象转换成 JSON 字符串。</li>
+<li>JSON.parse 用于将 JSON 字符串转换成 JavaScript 对象。</li>
+</ul>
+<p>具体用法如下：</p>
+<p></p><pre class="crayon-plain-tag">var str = '{"name": "Geoff Lui","age": 26,"friends":["Lucy","Lily","Gwen"]}';
+
+var obj = JSON.parse(str);  //返回一个 JavaScript 对象
+
+console.log(obj);
+
+var jsonstr = JSON.stringify(obj);  //返回一个 JSON 字符串
+
+console.log(jsonstr);</pre><p></p>
+<p>&nbsp;</p>
+<h1>参考资料</h1>
+<p>[1] JSON 对象，<a href="http://javascript.ruanyifeng.com/stdlib/json.html">http://javascript.ruanyifeng.com/stdlib/json.html</a></p>
+<p>[2] 数据类型和json格式，<a href="http://www.ruanyifeng.com/blog/2009/05/data_types_and_json.html">http://www.ruanyifeng.com/blog/2009/05/data_types_and_json.html</a></p>
+<p>[3] JSON 介绍，<a href="http://www.json.org.cn/index.htm">http://www.json.org.cn/index.htm</a></p>
+<p>[4] JSON 教程，<a href="http://www.w3school.com.cn/json/index.asp">http://www.w3school.com.cn/json/index.asp</a></p>
+<p>[5] JSON，<a href="https://www.json.com/">https://www.json.com/</a></p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2015 年 8 月 27 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=1852</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>【 地图系列 】 各县的 JSON 地图文件</title>
+		<link>http://www.ourd3js.com/wordpress/?p=739</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=739#comments</comments>
+		<pubDate>Thu, 08 Jan 2015 10:11:33 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[D3 地图系列]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[中国]]></category>
+		<category><![CDATA[县]]></category>
+		<category><![CDATA[地图]]></category>
+		<category><![CDATA[数据]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=739</guid>
+		<description><![CDATA[在【中国各省市级 JSON 文件】中，由上官真心网友提供了各省的文件，各省里包含 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=739">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>在【<a href="http://www.ourd3js.com/wordpress/?p=638">中国各省市级 JSON 文件</a>】中，由<span style="color: #0000ff;">上官真心<span style="color: #000000;">网友提供了各省的文件，各省里包含有各市的数据。但是省里并没有包含县的数据，常有朋友寻找。</span></span></p>
+<p><span id="more-739"></span></p>
+<p>最近，网友<span style="color: #0000ff;">寻梦<span style="color: #000000;">向本站</span></span>提供了市里所有县的 JSON 地图数据，感激不尽。请大家在点击下面的链接下载：</p>
+<p><a href="http://www.ourd3js.com/map/china_mapdata/mapdata.zip">mapdata.zip</a></p>
+<p>解压缩后有两个文件夹和一个 JSON 文件：</p>
+<ul>
+<li>geometryCouties：各市~县的数据</li>
+<li>geometryProvince：各省~市的数据</li>
+<li>china.json：中国~省的数据</li>
+</ul>
+<p>网友寻梦使用此数据制作了一个将GDP数据在地图上进行可视化的作品，供大家观赏。</p>
+<p><a href="http://www.ourd3js.com/collection/xunmeng/GDPMap/index.html"><img class="alignnone wp-image-736 size-large" src="http://www.ourd3js.com/wordpress/wp-content/uploads/2014/12/gdpmap-1024x473.png" alt="gdpmap" width="584" height="269" /></a></p>
+<p>再次感谢<span style="color: #0000ff;">上官真心</span>和<span style="color: #0000ff;">寻梦</span>提供的数据。</p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2014 年 1 月 8 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=739</wfw:commentRss>
+		<slash:comments>17</slash:comments>
+		</item>
+		<item>
+		<title>【 地图系列 】 旋转地球仪</title>
+		<link>http://www.ourd3js.com/wordpress/?p=675</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=675#comments</comments>
+		<pubDate>Thu, 11 Dec 2014 11:31:04 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[D3 地图系列]]></category>
+		<category><![CDATA[d3]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[svg]]></category>
+		<category><![CDATA[地球仪]]></category>
+		<category><![CDATA[绘制]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=675</guid>
+		<description><![CDATA[本例呈现一个旋转的地球仪，数据使用的是世界地图简化后的文件：world_605k &#8230; <a href="http://www.ourd3js.com/wordpress/?p=675">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>本例呈现一个旋转的地球仪，数据使用的是世界地图简化后的文件：<a href="http://www.ourd3js.com/map/demo/worldmap_sphere/world_605kb.json">world_605kb.json</a>。</p>
+<p><span id="more-675"></span></p>
+<p><iframe width="500" height="440" src="http://www.ourd3js.com/map/demo/worldmap_sphere/worldmap.html" marginwidth="0" marginheight="0" scrolling="yes"></iframe></p>
+<p>完整代码可见：</p>
+<p><a href="http://www.ourd3js.com/map/demo/worldmap_sphere/worldmap.html">http://www.ourd3js.com/map/demo/worldmap_sphere/worldmap.html</a></p>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2014 年 12 月 11 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=675</wfw:commentRss>
+		<slash:comments>20</slash:comments>
+		</item>
+		<item>
+		<title>【 地图系列 】 世界地图和主要国家的 JSON 文件</title>
+		<link>http://www.ourd3js.com/wordpress/?p=668</link>
+		<comments>http://www.ourd3js.com/wordpress/?p=668#comments</comments>
+		<pubDate>Tue, 09 Dec 2014 07:52:21 +0000</pubDate>
+		<dc:creator><![CDATA[馒头华华]]></dc:creator>
+				<category><![CDATA[D3 地图系列]]></category>
+		<category><![CDATA[JSON]]></category>
+		<category><![CDATA[国家]]></category>
+		<category><![CDATA[地图]]></category>
+		<category><![CDATA[文件]]></category>
+		<category><![CDATA[洲]]></category>
+
+		<guid isPermaLink="false">http://www.ourd3js.com/wordpress/?p=668</guid>
+		<description><![CDATA[花了点时间整理了世界地图和各主要国家的 JSON 地图文件，以备将来使用。文件比 &#8230; <a href="http://www.ourd3js.com/wordpress/?p=668">继续阅读 <span class="meta-nav">&#8594;</span></a>]]></description>
+				<content:encoded><![CDATA[<p>花了点时间整理了世界地图和各主要国家的 JSON 地图文件，以备将来使用。文件比较大，下载之后，自行在 <a href="http://mapshaper.org/">http://mapshaper.org/</a> 按需简化文件。</p>
+<p><span id="more-668"></span></p>
+<p>世界地图： <a href="http://www.ourd3js.com/map/worldmap/world.json">world.json</a></p>
+<p>美洲：</p>
+<ul>
+<li>美国：<a href="http://www.ourd3js.com/map/worldmap/America/USA.json">USA.json</a></li>
+<li>加拿大：<a href="http://www.ourd3js.com/map/worldmap/America/Canada.json">Canada.json</a></li>
+<li>巴西：<a href="http://www.ourd3js.com/map/worldmap/America/Brazil.json">Brazil.json</a></li>
+</ul>
+<p>大洋洲：</p>
+<ul>
+<li>澳大利亚：<a href="http://www.ourd3js.com/map/worldmap/Oceania/Australia.json">Australia.json</a></li>
+<li>新西兰：<a href="http://www.ourd3js.com/map/worldmap/Oceania/NewZealand.json">NewZealand.json</a></li>
+</ul>
+<p>亚洲：</p>
+<ul>
+<li>印度：<a href="http://www.ourd3js.com/map/worldmap/Asia/India.json">India.json</a></li>
+<li>日本：<a href="http://www.ourd3js.com/map/worldmap/Asia/Japan.json">Japan.json</a></li>
+<li>俄罗斯:<a href="http://www.ourd3js.com/map/worldmap/Asia/Russia.json">Russia.json</a></li>
+<li>新加坡：<a href="http://www.ourd3js.com/map/worldmap/Asia/Singapore.json">Singapore.json</a></li>
+<li>韩国：<a href="http://www.ourd3js.com/map/worldmap/Asia/SouthKorea.json">SouthKorea.json</a></li>
+</ul>
+<p>非洲：</p>
+<ul>
+<li>南非：<a href="http://www.ourd3js.com/map/worldmap/Africa/SouthAfrica.json">SouthAfrica.json</a></li>
+</ul>
+<p>欧洲：</p>
+<ul>
+<li>英国：<a href="http://www.ourd3js.com/map/worldmap/Europe/England.json">England.json</a></li>
+<li>法国：<a href="http://www.ourd3js.com/map/worldmap/Europe/France.json">France.json</a></li>
+<li>德国：<a href="http://www.ourd3js.com/map/worldmap/Europe/German.json">German.json</a></li>
+<li>冰岛：<a href="http://www.ourd3js.com/map/worldmap/Europe/Iceland.json">Iceland.json</a></li>
+<li>荷兰：<a href="http://www.ourd3js.com/map/worldmap/Europe/Netheland.json">Netheland.json</a></li>
+<li>挪威：<a href="http://www.ourd3js.com/map/worldmap/Europe/Norway.json">Norway.json</a></li>
+<li>葡萄牙：<a href="http://www.ourd3js.com/map/worldmap/Europe/Portugal.json">Portugal.json</a></li>
+<li>西班牙：<a href="http://www.ourd3js.com/map/worldmap/Europe/Spain.json">Spain.json</a></li>
+<li>瑞典：<a href="http://www.ourd3js.com/map/worldmap/Europe/Sweden.json">Sweden.json</a></li>
+<li>瑞士：<a href="http://www.ourd3js.com/map/worldmap/Europe/Swiss.json">Swiss.json</a></li>
+<li>芬兰：<a href="http://www.ourd3js.com/map/worldmap/Europe/Finland.json">Finland.json</a></li>
+</ul>
+<div style="background: #DDDDDD; border-radius: 15px; border: 2px solid black;">
+<h3 style="font-size: 20px; text-align: center; font-weight: bold;">文档信息</h3>
+<ul style="text-align: left;">
+<li>版权声明：署名（BY）-非商业性（NC）-禁止演绎（ND）</li>
+<li>发表日期：2014 年 12 月 9 日</li>
+<li>更多内容：<a href="http://www.ourd3js.com/">OUR D3.JS &#8211; 数据可视化专题站</a> 和 <a href="http://blog.csdn.net/lzhlzz">CSDN个人博客</a></li>
+<li>备注：本文发表于 <a href="http://www.ourd3js.com/">OUR D3.JS</a> ，转载请注明出处，谢谢</li>
+</ul>
+</div>
+]]></content:encoded>
+			<wfw:commentRss>http://www.ourd3js.com/wordpress/?feed=rss2&#038;p=668</wfw:commentRss>
+		<slash:comments>4</slash:comments>
+		</item>
+	</channel>
+</rss>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+ Served from: www.ourd3js.com @ 2016-06-03 15:45:54 by W3 Total Cache -->
