@@ -1,28 +1,29 @@
-## Workflow
+## Tools needed to install (if no installed)
+```
+brew install wget
+brew install ogr2ogr
+npm install -g topojson
+```
+
+## Extract Data
 1. Fetch zip file containing shapefile;
 ```
-wget --directory-prefix=.tmp --timestamping --input-file=natural_earth_urls.txt
-```
-2. Unzip it.
-3. Find the file ending with .shp
-4. Extract data from .shp with ogr2ogr
-
-Generate China's border with Hongkong, Macao and Taiwan:
-```
-ogr2ogr -f GeoJSON -where "ADM0_A3 IN ('CHN','MAC','HKG','TWN')" .tmp/china_border.json .tmp/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp
+source fetch.sh
 ```
 
-Generate Hongkong, Macao and Taiwan:
+2. Find the file ending with .shp
+
+3. Extract data from .shp with ogr2ogr
+We need to extract Hongkong and Taiwan from ne_10m_admin_0_countries.shp, and China Mainland and Macao from ne_10m_admin_1_states_provinces.shp, and then merge the two layers.
+
+Extract Hongkong and Taiwan:
 ```
-ogr2ogr -f GeoJSON -where "ADM0_A3 IN ('MAC','HKG','TWN')" .tmp/hmt.json .tmp/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp
+ogr2ogr -f GeoJSON -where "ADM0_A3 IN ('HKG','TWN')" .tmp/china_border.json .tmp/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp
 ```
 
-Generate China provinces with Hongkong, Macao and Taiwan:
+Extract provinces of China Mainland and Macao:
 ```
-ogr2ogr -f GeoJSON -where "adm0_a3 IN ('CHN','HKG','MAC','TWN')" .tmp/china_provinces.json .tmp/ne_10m_admin_1_states_provinces/ne_10m_admin_1_states_provinces.shp
+ogr2ogr -f GeoJSON -where "adm0_a3 IN ('CHN','MAC')" .tmp/china_provinces.json .tmp/ne_10m_admin_1_states_provinces/ne_10m_admin_1_states_provinces.shp
 ```
 
-5. We should join administrations under Taiwan into a single path since Taiwan should be treated as a province. Its cities should not be exposed at this level. So do Hongkong.
-
-
-6. Convert to topojson. Keep some attributes like `name_local`, `adm0_a3`.
+4. Use topojson to combine the two layers, simply the outline, and delete unnecessary json fileds. Keep some attributes like `name_local`, `adm0_a3`.
